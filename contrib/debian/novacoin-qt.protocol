@@ -1,0 +1,11 @@
+[Protocol]
+exec=HHCoin-qt '%u'
+protocol=HHCoin
+input=none
+output=none
+helper=true
+listing=
+reading=false
+writing=false
+makedir=false
+deleting=false

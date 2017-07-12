@@ -1,0 +1,68 @@
+#!/bin/sh
+
+# PROVIDE: HHCoin
+# REQUIRE: LOGIN
+# KEYWORD: shutdown
+
+#
+# Add the following lines to /etc/rc.conf.local or /etc/rc.conf
+# to enable this service:
+#
+# HHCoin_enable (bool): Set to NO by default. Set this variable to YES if you want to enable HHCoin service.
+# HHCoin_config (path): Set to /usr/local/etc/HHCoin.conf by default.
+# HHCoin_user:  The user account HHCoin daemon runs as. It uses 'root' user by default.
+# HHCoin_group: The group account HHCoin daemon runs as. It uses 'wheel' group by default.
+# HHCoin_datadir (str): Default to "/var/db/HHCoin". Base data directory.
+
+. /etc/rc.subr
+
+name=HHCoin
+rcvar=HHCoin_enable
+
+: ${HHCoin_enable:=NO}
+: ${HHCoin_config=/usr/local/etc/HHCoin.conf}
+: ${HHCoin_datadir=/var/db/HHCoin}
+: ${HHCoin_user="root"}
+: ${HHCoin_group="wheel"}
+
+required_files=${HHCoin_config}
+command=/usr/local/bin/HHCoind
+HHCoin_chdir=${HHCoin_datadir}
+pidfile="${HHCoin_datadir}/HHCoind.pid"
+stop_cmd=HHCoin_stop
+command_args="-conf=${HHCoin_config} -datadir=${HHCoin_datadir} -daemon -pid=${pidfile}"
+start_precmd="${name}_prestart"
+
+HHCoin_create_datadir()
+{
+	echo "Creating data directory"
+	eval mkdir -p ${HHCoin_datadir}
+	[ $? -eq 0 ] && chown -R ${HHCoin_user}:${HHCoin_group} ${HHCoin_datadir}
+}
+
+HHCoin_prestart()
+{
+	if [ ! -d "${HHCoin_datadir}/." ]; then
+		HHCoin_create_datadir || return 1
+	fi
+}
+
+HHCoin_requirepidfile()
+{
+	if [ ! "0`check_pidfile ${pidfile} ${command}`" -gt 1 ]; then
+		echo "${name} not running? (check $pidfile)."
+		exit 1
+	fi
+}
+
+HHCoin_stop()
+{
+    HHCoin_requirepidfile
+
+	echo "Stopping ${name}."
+	eval ${command} -conf=${HHCoin_config} -datadir=${HHCoin_datadir} stop
+	wait_for_pids ${rc_pid}
+}
+
+load_rc_config $name
+run_rc_command "$1"

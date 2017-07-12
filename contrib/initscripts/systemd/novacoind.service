@@ -1,0 +1,11 @@
+[Unit]
+Description=HHCoin daemon serivce
+After=network.target
+
+[Service]
+Type=simple
+User=HHCoin
+ExecStart=/opt/HHCoin/HHCoind
+
+[Install]
+WantedBy=multi-user.target

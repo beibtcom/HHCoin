@@ -1,0 +1,5 @@
+HHCoin-qt usr/bin
+share/pixmaps/HHCoin32.xpm usr/share/pixmaps
+share/pixmaps/HHCoin80.xpm usr/share/pixmaps
+debian/HHCoin-qt.desktop usr/share/applications
+debian/HHCoin-qt.protocol usr/share/kde4/services/
